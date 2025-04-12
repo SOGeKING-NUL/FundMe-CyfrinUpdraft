@@ -17,12 +17,33 @@ import {PriceConverter} from "./PriceConverter.sol";
 contract FundMe{
 
     using PriceConverter for uint256;
-    address public i_owner;
+    address public owner;
+    mapping(uint256 => address) public AddressFunded;
     uint256 price;
 
     constructor(){
-        i_owner = msg.sender;
+        owner = msg.sender;
     }
 
-    function fund(uint256 ethAmount) public payble
+    function fund() public payable{
+        require(PriceConverter.getConversionRate(msg.value) >= 1,  "Alteast donate 1 Dollar worth of ETH");
+
+    }
+
+    function withdraw() public onlyOwner payable{
+
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _; //to let the conde execute after too
+    }
+
+    fallback() external payable {
+        fund();
+    }
+
+    receive() external payable {
+        fund();
+    }
 }

@@ -13,7 +13,6 @@ contract FundMeScript is Script{
         vm.startBroadcast();
 
         FundMe fundme = new FundMe();
-        console.log(fundme.Price());
 
         vm.stopBroadcast();
     }
