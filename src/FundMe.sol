@@ -18,20 +18,29 @@ contract FundMe{
 
     using PriceConverter for uint256;
     address public owner;
-    mapping(uint256 => address) public AddressFunded;
-    uint256 price;
+    mapping(address => uint256) public AmountAddressFunded;
+    uint256 MIN_USD_ALLOWED= 5 * 10 ** 18;
+    address[] public funders;
+    AggregatorV3Interface private s_priceFeed;
 
-    constructor(){
+    constructor(AggregatorV3Interface priceFeed){
         owner = msg.sender;
+        s_priceFeed= AggregatorV3Interface(priceFeed); //pricefeed is the contract address at which the price is deployed on a network
     }
 
     function fund() public payable{
-        require(PriceConverter.getConversionRate(msg.value) >= 1,  "Alteast donate 1 Dollar worth of ETH");
-
+        require(PriceConverter.getConversionRate(msg.value, s_priceFeed) >= MIN_USD_ALLOWED,  "Alteast donate 5 Dollar worth of ETH");
+        AmountAddressFunded[msg.sender] += msg.value;
+        funders.push(msg.sender);
     }
 
     function withdraw() public onlyOwner payable{
+        for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++ ){
+            address funder = funders[funderIndex];
+            AmountAddressFunded[funder]= 0;            
+        }
 
+        funders = new address[](0);
     }
 
     modifier onlyOwner() {
