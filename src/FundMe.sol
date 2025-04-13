@@ -1,16 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-
-/*
--> import aggregator, price convertor
--> contructor has owner
--> fund checks for enough money to fund ad adds to contract
--> get aggregator version
--> withdraw funds
--> fallback and revert
-*/
-
 import {AggregatorV3Interface} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 import {PriceConverter} from "./PriceConverter.sol";
 
@@ -19,11 +9,11 @@ contract FundMe{
     using PriceConverter for uint256;
     address public owner;
     mapping(address => uint256) public AmountAddressFunded;
-    uint256 MIN_USD_ALLOWED= 5 * 10 ** 18;
+    uint256 public MIN_USD_ALLOWED= 5 * 10 ** 18;
     address[] public funders;
     AggregatorV3Interface private s_priceFeed;
 
-    constructor(AggregatorV3Interface priceFeed){
+    constructor(address priceFeed){
         owner = msg.sender;
         s_priceFeed= AggregatorV3Interface(priceFeed); //pricefeed is the contract address at which the price is deployed on a network
     }
