@@ -8,9 +8,9 @@ contract FundMe{
 
     using PriceConverter for uint256;
     address public owner;
-    mapping(address => uint256) public AmountAddressFunded;
+    mapping(address => uint256) private s_AmountAddressFunded;
     uint256 public MIN_USD_ALLOWED= 5 * 10 ** 18;
-    address[] public funders;
+    address[] private s_funders;
     AggregatorV3Interface private s_priceFeed;
 
     constructor(address priceFeed){
@@ -20,17 +20,17 @@ contract FundMe{
 
     function fund() public payable{
         require(PriceConverter.getConversionRate(msg.value, s_priceFeed) >= MIN_USD_ALLOWED,  "Alteast donate 5 Dollar worth of ETH");
-        AmountAddressFunded[msg.sender] += msg.value;
-        funders.push(msg.sender);
+        s_AmountAddressFunded[msg.sender] += msg.value;
+        s_funders.push(msg.sender);
     }
 
     function withdraw() public onlyOwner payable{
-        for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++ ){
-            address funder = funders[funderIndex];
-            AmountAddressFunded[funder]= 0;            
+        for (uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++ ){
+            address funder = s_funders[funderIndex];
+            s_AmountAddressFunded[funder]= 0;            
         }
 
-        funders = new address[](0);
+        s_funders = new address[](0);
     }
 
     modifier onlyOwner() {
@@ -44,5 +44,18 @@ contract FundMe{
 
     receive() external payable {
         fund();
+    }
+
+
+
+
+    //getter functions
+
+    function getAmountAddressFunded(address funder) external view returns(uint256){
+        return s_AmountAddressFunded[funder];
+    }
+
+    function getFunder (uint256 index) external view returns(address){
+        return s_funders[index];
     }
 }
