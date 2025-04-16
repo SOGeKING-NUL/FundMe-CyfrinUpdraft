@@ -31,11 +31,17 @@ contract FundMe{
         }
 
         s_funders = new address[](0);
+        (bool success,)= payable(owner).call{value: address(this).balance}("");
+        require(success, "Transfer Failed");
     }
 
     modifier onlyOwner() {
         require(msg.sender == owner);
         _; //to let the conde execute after too
+    }
+
+    function getOwner() external view returns(address){
+        return owner;
     }
 
     fallback() external payable {
@@ -47,10 +53,7 @@ contract FundMe{
     }
 
 
-
-
     //getter functions
-
     function getAmountAddressFunded(address funder) external view returns(uint256){
         return s_AmountAddressFunded[funder];
     }
