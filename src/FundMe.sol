@@ -13,6 +13,9 @@ contract FundMe{
     address[] private s_funders;
     AggregatorV3Interface private s_priceFeed;
 
+    event Withdrawal(address indexed owner, uint256 amount);
+    event FundersReset();
+
     constructor(address priceFeed){
         owner = msg.sender;
         s_priceFeed= AggregatorV3Interface(priceFeed); //pricefeed is the contract address at which the price is deployed on a network
@@ -25,16 +28,21 @@ contract FundMe{
     }
 
     function withdraw() public onlyOwner payable{
+        
         for (uint256 funderIndex = 0; funderIndex < s_funders.length; funderIndex++ ){
             address funder = s_funders[funderIndex];
             s_AmountAddressFunded[funder]= 0;            
         }
+        emit FundersReset();
+
 
         s_funders = new address[](0); //resetting the funders array to 0;
 
         require(address(this).balance > 0, "No funds available to withdraw");
         (bool success,)= payable(owner).call{value: address(this).balance}("");
         require(success, "Transfer Failed");
+        emit Withdrawal(owner, address(this).balance);
+
     }
 
     modifier onlyOwner() {
