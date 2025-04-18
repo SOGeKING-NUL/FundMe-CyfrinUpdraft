@@ -25,14 +25,14 @@ contract HelperConfig is Script {
         }
     }
 
-    function getSepoliaEthConfig() public returns (NetworkConfig memory) {
+    function getSepoliaEthConfig() public view returns (NetworkConfig memory) {
     NetworkConfig memory sepoliaConfig= NetworkConfig({
         priceFeed: 0x694AA1769357215DE4FAC081bf1f309aDC325306
         });
     return sepoliaConfig;
     }
 
-    function getMainnetConfig() public returns (NetworkConfig memory) {
+    function getMainnetConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory mainnetConfig= NetworkConfig({
             priceFeed: 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
             });

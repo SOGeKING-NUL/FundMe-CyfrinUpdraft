@@ -30,7 +30,9 @@ contract FundMe{
             s_AmountAddressFunded[funder]= 0;            
         }
 
-        s_funders = new address[](0);
+        s_funders = new address[](0); //resetting the funders array to 0;
+
+        require(address(this).balance > 0, "No funds available to withdraw");
         (bool success,)= payable(owner).call{value: address(this).balance}("");
         require(success, "Transfer Failed");
     }
