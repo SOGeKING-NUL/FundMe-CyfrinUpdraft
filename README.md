@@ -1,65 +1,81 @@
-## Foundry
+# FundMe Smart Contract
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
 
-Foundry consists of:
+FundMe is a Solidity smart contract that allows users to fund a project with ETH. The contract ensures that each donation meets a minimum USD value using Chainlink price feeds for ETH/USD conversion. Only the contract owner can withdraw the accumulated funds.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Features
 
-## Documentation
+- **Minimum Donation Requirement**: Enforces a minimum donation of $5 USD worth of ETH
+- **Chainlink Price Feeds**: Uses Chainlink oracles for accurate ETH/USD conversion rates
+- **Owner-Only Withdrawal**: Only the contract owner can withdraw funds
+- **Donation Tracking**: Keeps track of all funders and their donation amounts
+- **Fallback Functions**: Automatically handles direct ETH transfers to the contract
 
+## Contract Details
+
+### State Variables
+
+- `owner`: Address of the contract deployer who has withdrawal privileges
+- `MIN_USD_ALLOWED`: Minimum donation amount in USD (5 USD, scaled to 18 decimals)
+- `s_AmountAddressFunded`: Mapping to track how much each address has funded
+- `s_funders`: Array of addresses that have funded the contract
+- `s_priceFeed`: Chainlink price feed interface for ETH/USD conversion
+
+### Functions
+
+- `constructor(address priceFeed)`: Initializes the contract with the owner and price feed address
+- `fund()`: Allows users to donate ETH (requires minimum USD value)
+- `withdraw()`: Allows the owner to withdraw all funds and reset funder data
+- `getOwner()`: Returns the address of the contract owner
+- `getAmountAddressFunded(address)`: Returns the amount funded by a specific address
+- `getFunder(uint256)`: Returns the address of a funder at a specific index
+
+### Events
+
+- `Withdrawal`: Emitted when the owner withdraws funds
+- `FundersReset`: Emitted when the funders list is reset during withdrawal
+
+### Modifiers
+
+- `onlyOwner`: Restricts function access to the contract owner
+
+## Dependencies
+
+- Chainlink Aggregator V3 Interface for price feeds
+- PriceConverter library for ETH to USD conversion
 
 ## Usage
 
-### Build
+### Funding the Contract
 
-```shell
-$ forge build
+```solidity
+// Send ETH with a value of at least $5 USD
+fundMeContract.fund{value: 1000000000000000000}() // 1 ETH
 ```
 
-### Test
+### Withdrawing Funds (Owner Only)
 
-```shell
-$ forge test
+```solidity
+// Only the contract owner can call this
+fundMeContract.withdraw()
 ```
 
-### Format
+### Getting Contract Information
 
-```shell
-$ forge fmt
+```solidity
+// Get the contract owner
+address owner = fundMeContract.getOwner()
+
+// Get amount funded by an address
+uint256 amountFunded = fundMeContract.getAmountAddressFunded(userAddress)
+
+// Get a funder at a specific index
+address funder = fundMeContract.getFunder(0)
 ```
 
-### Gas Snapshots
+## Security Features
 
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- Owner-only withdrawal protection
+- Minimum donation requirement
+- Proper validation of fund transfers
