@@ -1,0 +1,6 @@
+FundMeTest:testFundUpdatesFundedDataStructure() (gas: 105617)
+FundMeTest:testMinimumValueIsFive() (gas: 10963)
+FundMeTest:testOwner() (gas: 11208)
+FundMeTest:testRevertIfLessThanFive() (gas: 34004)
+FundMeTest:testWithdrawalFromSingleFunder() (gas: 94760)
+FundMeTest:testWithdrawlFromMultipleFunder() (gas: 566418)
